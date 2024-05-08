@@ -10,15 +10,15 @@ export type Size = {
   height: number
 }
 
-export enum Direction {
+export const enum Direction {
   Up, Right, Down, Left
 }
 
-export enum Color {
+export const enum Color {
   Black, Blue, Yellow, White
 }
 
-export enum Key {
+export const enum Key {
   Up = 1, Right, Down, Left, Space, Enter, Quit
 }
 
