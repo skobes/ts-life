@@ -2,9 +2,10 @@
 
 import { Color, Key, Size } from "./basetypes.js"
 
-import { default as blessed, BlessedProgram } from "blessed"
+import { default as blessed, BlessedProgram, colors } from "blessed"
 import { Key as PlatformKey } from "readline"
 
+const UPPER_HALF_BLOCK = "\u2580";
 const LOWER_HALF_BLOCK = "\u2584";
 const DEFAULT_BG = "black";
 const KEYSEQ_CTRL_C = "\x03";
@@ -41,19 +42,17 @@ export class Terminal {
   }
 
   setPixel(x: number, y: number, topColor: Color, bottomColor: Color) {
-    const p = this.program;
-    p.move(x, y);
-    p.bg(colorStr(topColor));
-    p.fg(colorStr(bottomColor));
-    p.write(LOWER_HALF_BLOCK);
+    const tc = colorStr(topColor);
+    const bc = colorStr(bottomColor);
+
+    if (tc == DEFAULT_BG)
+      this.printHelper(x, y, tc, bc, LOWER_HALF_BLOCK);
+    else
+      this.printHelper(x, y, bc, tc, UPPER_HALF_BLOCK);
   }
 
   print(s: string, x: number, y: number) {
-    const p = this.program;
-    p.move(x, y);
-    p.bg(colorStr(Color.Black));
-    p.fg(colorStr(Color.White));
-    p.write(s);
+    this.printHelper(x, y, colorStr(Color.Black), colorStr(Color.White), s);
   }
 
   setUp() {
@@ -68,6 +67,15 @@ export class Terminal {
     p.clear();
     p.showCursor();
     p.normalBuffer();
+  }
+
+  private printHelper(x: number, y: number,
+                      bg: string, fg: string, s: string) {
+    const p = this.program;
+    p.move(x, y);
+    p.bg(bg);
+    p.fg(fg);
+    p.write(s);
   }
 
   private handleKeyPress(_ch: string, key: PlatformKey) {
